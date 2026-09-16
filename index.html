@@ -1,7 +1,72 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>2027 데이터쿡·인디제이 영업 대시보드</title>
-<style>:root{--bg:#f4f7fb;--card:#fff;--ink:#14213d;--muted:#697386;--line:#dfe6ef;--nav:#163a63;--accent:#2f6fed;--good:#e7f7ec;--warn:#fff4d6}*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--ink)}header{background:linear-gradient(120deg,#163a63,#24558e);color:#fff;padding:28px 32px}header h1{margin:0 0 6px;font-size:26px}header p{margin:0;opacity:.88}.wrap{max-width:1500px;margin:auto;padding:20px}.toolbar{display:grid;grid-template-columns:1.2fr .7fr .7fr auto auto;gap:12px;margin-bottom:14px}input,select,button{height:42px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#fff}button{cursor:pointer;font-weight:700}.primary{background:var(--accent);color:#fff;border:none}.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}.card b{font-size:24px;display:block;margin-top:5px}.muted{color:var(--muted);font-size:12px}.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;overflow:auto}table{width:100%;border-collapse:collapse;min-width:1250px}th,td{padding:11px 9px;border-bottom:1px solid var(--line);text-align:left;font-size:13px;vertical-align:top}th{position:sticky;top:0;background:#edf3fa}.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px}.Splus,.S{background:var(--good);color:#116b37}.Aplus,.A{background:var(--warn);color:#8b5c00}.Bplus,.B{background:#eef1f6;color:#4e5968}.progress{width:110px;height:8px;background:#e9edf4;border-radius:10px;overflow:hidden}.progress i{display:block;height:100%;background:#2f6fed}footer{color:var(--muted);padding:12px 2px;font-size:12px}@media(max-width:900px){.toolbar{grid-template-columns:1fr 1fr}.cards{grid-template-columns:1fr 1fr}}</style></head>
-<body><header><h1>2027 데이터쿡·인디제이 공공 AI 영업 대시보드</h1><p>GitHub Actions가 나라장터 신규 공고를 자동 수집하고 data.json을 갱신합니다.</p></header><div class="wrap">
-<div class="toolbar"><input id="q" placeholder="사업명·기관·시장 검색"><select id="grade"><option value="">전체 적합도</option><option>S+</option><option>S</option><option>A+</option><option>A</option><option>B+</option><option>B</option></select><select id="status"><option value="">전체 영업상태</option><option>미접촉</option><option>접촉예정</option><option>접촉완료</option><option>미팅예정</option><option>미팅완료</option><option>파트너협의</option><option>제안준비</option><option>제안중</option><option>수주</option><option>보류</option></select><button class="primary" id="refresh">최신 데이터 새로고침</button><button id="export">CSV 내보내기</button></div>
-<div class="cards"><div class="card"><span class="muted">전체 파이프라인</span><b id="kpiCount">-</b></div><div class="card"><span class="muted">예산 합계</span><b id="kpiBudget">-</b></div><div class="card"><span class="muted">데이터쿡 S+</span><b id="kpiDC">-</b></div><div class="card"><span class="muted">인디제이 S+</span><b id="kpiIJ">-</b></div><div class="card"><span class="muted">최근 업데이트</span><b id="kpiUpdated" style="font-size:15px">-</b></div></div>
-<div class="panel"><table><thead><tr><th>No</th><th>사업/사업군</th><th>기관</th><th>시장</th><th>예산</th><th>예상발주</th><th>데이터쿡</th><th>인디제이</th><th>참여전략</th><th>Next Action</th><th>단계</th><th>상태</th><th>진행률</th></tr></thead><tbody id="tbody"></tbody></table></div><footer>자동수집은 GitHub Actions가 수행합니다. API 키는 GitHub Secrets의 DATA_GO_KR_API_KEY에 저장하세요. 화면의 새로고침 버튼은 저장소의 최신 data.json을 다시 읽습니다.</footer></div>
-<script>let source={pipeline:[],updatedAt:null};const key="g2b-sales-overrides-v1";const saved=()=>JSON.parse(localStorage.getItem(key)||"{}");const money=n=>!n?"파생/미정":n>=1e8?(n/1e8).toLocaleString("ko-KR",{maximumFractionDigits:1})+"억":n.toLocaleString()+"원";const cls=g=>g.replace("+","plus");function override(r){return {...r,...(saved()[r.no]||{})}}function persist(no,patch){const a=saved();a[no]={...(a[no]||{}),...patch};localStorage.setItem(key,JSON.stringify(a));render()}function render(){const q=document.querySelector("#q").value.trim().toLowerCase(),g=document.querySelector("#grade").value,s=document.querySelector("#status").value;let rows=source.pipeline.map(override).filter(r=>!q||[r.name,r.agency,r.market].join(" ").toLowerCase().includes(q));if(g)rows=rows.filter(r=>r.datacook===g||r.indij===g);if(s)rows=rows.filter(r=>r.status===s);document.querySelector("#tbody").innerHTML=rows.map(r=>`<tr><td>${r.no}</td><td><b>${r.name}</b><br><span class="muted">${r.basis||""}</span></td><td>${r.agency}</td><td>${r.market}</td><td>${money(r.budget)}</td><td>${r.expected}</td><td><span class="pill ${cls(r.datacook)}">${r.datacook}</span></td><td><span class="pill ${cls(r.indij)}">${r.indij}</span></td><td>${r.strategy}</td><td>${r.next}</td><td>${r.stage}</td><td><select onchange="persist(${r.no},{status:this.value})">${["미접촉","접촉예정","접촉완료","미팅예정","미팅완료","파트너협의","제안준비","제안중","수주","보류"].map(x=>`<option ${x===r.status?"selected":""}>${x}</option>`).join("")}</select></td><td><div class="progress"><i style="width:${r.progress||0}%"></i></div><input type="number" min="0" max="100" value="${r.progress||0}" style="width:72px;height:30px;margin-top:5px" onchange="persist(${r.no},{progress:+this.value})">%</td></tr>`).join("");document.querySelector("#kpiCount").textContent=source.pipeline.length;document.querySelector("#kpiBudget").textContent=money(source.pipeline.reduce((a,b)=>a+(b.budget||0),0));document.querySelector("#kpiDC").textContent=source.pipeline.filter(x=>x.datacook==="S+").length;document.querySelector("#kpiIJ").textContent=source.pipeline.filter(x=>x.indij==="S+").length;document.querySelector("#kpiUpdated").textContent=source.updatedAt?new Date(source.updatedAt).toLocaleString("ko-KR"):"-"}async function load(){const b=document.querySelector("#refresh");b.disabled=true;b.textContent="불러오는 중...";try{source=await fetch("data.json?"+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("data.json 로드 실패");return r.json()})}catch(e){alert(e.message)}finally{b.disabled=false;b.textContent="최신 데이터 새로고침"}render()}function exportCsv(){const rows=source.pipeline.map(override),cols=["no","name","agency","market","budget","basis","expected","datacook","indij","strategy","next","stage","status","progress"];const csv=[cols.join(","),...rows.map(r=>cols.map(c=>`"${String(r[c]??"").replaceAll('"','""')}"`).join(","))].join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}));a.download="영업파이프라인.csv";a.click()}["q","grade","status"].forEach(id=>document.querySelector("#"+id).addEventListener("input",render));document.querySelector("#refresh").onclick=load;document.querySelector("#export").onclick=exportCsv;load();</script></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>데이터쿡·인디제이 나라장터 영업 대시보드</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#14213d;--muted:#697386;--line:#dfe6ef;--nav:#163a63;--accent:#2f6fed;--good:#e7f7ec;--warn:#fff4d6;--danger:#ffe2e2}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(120deg,#163a63,#24558e);color:#fff;padding:27px 32px}header h1{margin:0 0 7px;font-size:26px}header p{margin:0;opacity:.88}
+.wrap{max-width:1650px;margin:auto;padding:20px}.toolbar{display:grid;grid-template-columns:1.4fr .75fr .75fr .8fr auto auto;gap:10px;margin-bottom:14px}
+input,select,button{height:42px;border:1px solid var(--line);border-radius:10px;padding:0 11px;background:#fff}button{cursor:pointer;font-weight:700}.primary{background:var(--accent);color:#fff;border:none}
+.cards{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px}.card b{font-size:23px;display:block;margin-top:5px}.muted{color:var(--muted);font-size:12px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;overflow:auto}table{width:100%;border-collapse:collapse;min-width:1540px}th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:13px;vertical-align:top}th{position:sticky;top:0;background:#edf3fa;z-index:2}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:700;font-size:12px;white-space:nowrap}.Splus,.S{background:var(--good);color:#116b37}.Aplus,.A{background:var(--warn);color:#8b5c00}.Bplus,.B{background:#eef1f6;color:#4e5968}.src-plan{background:#e8edff;color:#3048a3}.src-spec{background:#efe8ff;color:#6a3aa8}.src-bid{background:#e8f7ee;color:#17653b}.hot{background:#fff0d6;color:#8a5700}.urgent{background:var(--danger);color:#a01717}.closed{background:#eee;color:#666}.priority{font-weight:800}.row-top{background:#fbfffc}.row-urgent{background:#fffafa}
+.progress{width:95px;height:7px;background:#e9edf4;border-radius:10px;overflow:hidden}.progress i{display:block;height:100%;background:#2f6fed}.dday{font-size:16px;font-weight:800;white-space:nowrap}.dday.urgentText{color:#c61f1f}.dday.goodText{color:#1f6b42}
+footer{color:var(--muted);padding:12px 2px;font-size:12px}@media(max-width:1000px){.toolbar{grid-template-columns:1fr 1fr}.cards{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header><h1>데이터쿡·인디제이 공공 AI 영업 대시보드</h1><p>나라장터 발주계획 → 사전규격 → 본공고 자동수집 · D-Day · S/S+ 자동 우선표시</p></header>
+<div class="wrap">
+<div class="toolbar">
+<input id="q" placeholder="사업명·기관·시장 검색">
+<select id="source"><option value="">전체 단계</option><option>발주계획</option><option>사전규격</option><option>본공고</option></select>
+<select id="grade"><option value="">전체 적합도</option><option>S+</option><option>S</option><option>A+</option><option>A</option><option>B+</option><option>B</option></select>
+<select id="priority"><option value="">전체 우선순위</option><option value="top">🔥 S/S+ 우선</option><option value="urgent">⚠️ D-7 미만</option><option value="open">마감 전</option></select>
+<button class="primary" id="refresh">최신 데이터</button><button id="export">CSV</button>
+</div>
+<div class="cards">
+<div class="card"><span class="muted">전체 Pipeline</span><b id="kpiCount">-</b></div>
+<div class="card"><span class="muted">🔥 S/S+ 우선</span><b id="kpiTop">-</b></div>
+<div class="card"><span class="muted">발주계획</span><b id="kpiPlan">-</b></div>
+<div class="card"><span class="muted">사전규격</span><b id="kpiSpec">-</b></div>
+<div class="card"><span class="muted">본공고</span><b id="kpiBid">-</b></div>
+<div class="card"><span class="muted">최근 업데이트</span><b id="kpiUpdated" style="font-size:14px">-</b></div>
+</div>
+<div class="panel"><table><thead><tr>
+<th>우선</th><th>단계</th><th>No</th><th>사업명</th><th>수요/발주기관</th><th>예산</th><th>마감/발주예정</th><th>D-Day</th><th>데이터쿡</th><th>인디제이</th><th>참여전략</th><th>Next Action</th><th>영업상태</th><th>진행률</th>
+</tr></thead><tbody id="tbody"></tbody></table></div>
+<footer>기본 정렬은 S+/S 및 선행영업 가치가 높은 사업 우선입니다. D-7 미만은 마감임박으로 표시합니다. API 활용신청은 입찰공고·사전규격·발주계획 서비스별로 승인되어 있어야 합니다.</footer>
+</div>
+<script>
+let sourceData={pipeline:[],updatedAt:null};const storeKey="g2b-sales-overrides-v2";
+const saved=()=>JSON.parse(localStorage.getItem(storeKey)||"{}");
+const money=n=>!n?"미정":n>=1e8?(n/1e8).toLocaleString("ko-KR",{maximumFractionDigits:1})+"억":Number(n).toLocaleString()+"원";
+const cls=g=>(g||"B").replace("+","plus");
+const isTop=r=>["S+","S"].includes(r.datacook)||["S+","S"].includes(r.indij);
+function merged(r){return {...r,...(saved()[r.no]||{})}}
+function persist(no,patch){const a=saved();a[no]={...(a[no]||{}),...patch};localStorage.setItem(storeKey,JSON.stringify(a));render()}
+function srcClass(s){return s==="발주계획"?"src-plan":s==="사전규격"?"src-spec":"src-bid"}
+function priorityClass(p){return (p||"").includes("마감임박")?"urgent":(p||"").includes("최우선")||(p||"").includes("S 우선")?"hot":(p||"")==="마감"?"closed":""}
+function ddayText(r){if(r.dDay===null||r.dDay===undefined)return r.stage==="발주계획"?"선행":"-";if(r.dDay<0)return "마감";if(r.dDay===0)return "D-Day";return `D-${r.dDay}`}
+function render(){
+ const q=document.querySelector("#q").value.trim().toLowerCase(),st=document.querySelector("#source").value,g=document.querySelector("#grade").value,p=document.querySelector("#priority").value;
+ let rows=sourceData.pipeline.map(merged).filter(r=>!q||[r.name,r.agency,r.market,r.stage].join(" ").toLowerCase().includes(q));
+ if(st)rows=rows.filter(r=>r.stage===st);if(g)rows=rows.filter(r=>r.datacook===g||r.indij===g);
+ if(p==="top")rows=rows.filter(isTop);if(p==="urgent")rows=rows.filter(r=>r.dDay!==null&&r.dDay!==undefined&&r.dDay>=0&&r.dDay<7);if(p==="open")rows=rows.filter(r=>r.dDay===null||r.dDay===undefined||r.dDay>=0);
+ rows.sort((a,b)=>(b.priorityScore||0)-(a.priorityScore||0)||((a.dDay??99999)-(b.dDay??99999)));
+ document.querySelector("#tbody").innerHTML=rows.map(r=>{const urgent=r.dDay!==null&&r.dDay!==undefined&&r.dDay>=0&&r.dDay<7;return `<tr class="${urgent?'row-urgent':isTop(r)?'row-top':''}">
+ <td><span class="pill ${priorityClass(r.priority)} priority">${r.priority||"관심"}</span></td><td><span class="pill ${srcClass(r.stage)}">${r.stage||"-"}</span></td><td>${r.no}</td>
+ <td><b>${r.name||""}</b><br><span class="muted">${r.sourceId||r.basis||""}</span></td><td>${r.agency||""}</td><td>${money(r.budget)}</td><td>${r.expected||"-"}</td>
+ <td><span class="dday ${urgent?'urgentText':(r.dDay??-1)>=7?'goodText':''}">${ddayText(r)}</span></td><td><span class="pill ${cls(r.datacook)}">${r.datacook||"B"}</span></td><td><span class="pill ${cls(r.indij)}">${r.indij||"B"}</span></td>
+ <td>${r.strategy||""}</td><td>${r.next||""}</td><td><select onchange="persist(${r.no},{status:this.value})">${["미접촉","접촉예정","접촉완료","미팅예정","미팅완료","파트너협의","제안준비","제안중","수주","보류"].map(x=>`<option ${x===r.status?'selected':''}>${x}</option>`).join("")}</select></td>
+ <td><div class="progress"><i style="width:${r.progress||0}%"></i></div><input type="number" min="0" max="100" value="${r.progress||0}" style="width:68px;height:28px;margin-top:5px" onchange="persist(${r.no},{progress:+this.value})">%</td></tr>`}).join("");
+ const all=sourceData.pipeline;document.querySelector("#kpiCount").textContent=all.length;document.querySelector("#kpiTop").textContent=all.filter(isTop).length;document.querySelector("#kpiPlan").textContent=all.filter(x=>x.stage==="발주계획").length;document.querySelector("#kpiSpec").textContent=all.filter(x=>x.stage==="사전규격").length;document.querySelector("#kpiBid").textContent=all.filter(x=>x.stage==="본공고").length;document.querySelector("#kpiUpdated").textContent=sourceData.updatedAt?new Date(sourceData.updatedAt).toLocaleString("ko-KR"):"-";
+}
+async function load(){const b=document.querySelector("#refresh");b.disabled=true;b.textContent="불러오는 중...";try{sourceData=await fetch("data.json?"+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("data.json 로드 실패");return r.json()})}catch(e){alert(e.message)}finally{b.disabled=false;b.textContent="최신 데이터"}render()}
+function exportCsv(){const rows=sourceData.pipeline.map(merged),cols=["priority","stage","no","name","agency","budget","expected","dDay","datacook","indij","strategy","next","status","progress","sourceId"];const csv=[cols.join(","),...rows.map(r=>cols.map(c=>`"${String(r[c]??"").replaceAll('"','""')}"`).join(","))].join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}));a.download="나라장터_영업파이프라인.csv";a.click()}
+["q","source","grade","priority"].forEach(id=>document.querySelector("#"+id).addEventListener("input",render));document.querySelector("#refresh").onclick=load;document.querySelector("#export").onclick=exportCsv;load();
+</script>
+</body></html>
