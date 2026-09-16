@@ -1,0 +1,15 @@
+{
+  "updatedAt": "2026-09-16T15:33:00+09:00",
+  "pipeline": [
+    {"no":1,"name":"AI 통합민원플랫폼","agency":"행정안전부/NIA","market":"AI정부·공공행정","budget":20300000000,"basis":"확정","expected":"2027 Q1~Q2","datacook":"S+","indij":"S+","strategy":"공동제안","next":"기존 구축사·PMO·NIA 담당부서 접촉","stage":"예산","status":"미접촉","progress":0},
+    {"no":2,"name":"범정부 온AI·행정업무 AI 적용","agency":"행정안전부/NIA","market":"AI정부·공공행정","budget":54200000000,"basis":"확정","expected":"2027 연중","datacook":"S+","indij":"S+","strategy":"공동제안","next":"부처별 Agent/RAG 과제 및 담당부서 선점","stage":"예산","status":"미접촉","progress":0},
+    {"no":3,"name":"공공조달 AI 전환","agency":"조달청","market":"AI정부·공공행정","budget":59200000000,"basis":"확정","expected":"2027 Q1~Q3","datacook":"S+","indij":"S","strategy":"데이터쿡 중심+인디제이","next":"나라장터·조달데이터 AI 기존 수행사 조사","stage":"예산","status":"미접촉","progress":0},
+    {"no":4,"name":"AI 책임형 발주관리 플랫폼","agency":"조달청","market":"AI정부·공공행정","budget":2600000000,"basis":"확정/신규","expected":"2027 Q1~Q2","datacook":"S+","indij":"S+","strategy":"공동제안","next":"RFP 작성·검토 Agent 제안서 초안 준비","stage":"예산","status":"미접촉","progress":0},
+    {"no":5,"name":"AI 친화 통계 메타데이터·온톨로지","agency":"국가데이터처","market":"데이터·온톨로지","budget":6800000000,"basis":"확정","expected":"2027 Q1~Q2","datacook":"S+","indij":"A+","strategy":"데이터쿡 중심+전문파트너","next":"온톨로지·Knowledge Graph 전문사 확보","stage":"예산","status":"미접촉","progress":0},
+    {"no":6,"name":"제조 AX·스마트공장 보급확산","agency":"중기부/스마트제조혁신추진단","market":"제조AX","budget":468200000000,"basis":"확정","expected":"2027 연중","datacook":"S+","indij":"A","strategy":"데이터쿡 중심","next":"지역 TP·스마트제조 주관 SI사 선점","stage":"예산","status":"미접촉","progress":0},
+    {"no":7,"name":"질병데이터ON ISP","agency":"질병관리청","market":"의료·보건 AI","budget":200000000,"basis":"확정/신규","expected":"2027 Q1","datacook":"S+","indij":"A","strategy":"데이터쿡 주관/컨소","next":"ISP 발주 전 담당부서·유관업체 접촉","stage":"예산","status":"미접촉","progress":0},
+    {"no":8,"name":"국가 보건의료데이터 허브·소버린 AI","agency":"보건복지부","market":"의료·보건 AI","budget":34900000000,"basis":"확정","expected":"2027 Q1~Q3","datacook":"S+","indij":"S","strategy":"대형SI+공동","next":"의료데이터·대형 SI 컨소시엄 사전 구성","stage":"예산","status":"미접촉","progress":0},
+    {"no":9,"name":"스마트항만 운영기술 개발","agency":"해양수산부/항만공사","market":"항만·물류 AI","budget":18000000000,"basis":"확정","expected":"2027 Q1~Q3","datacook":"S+","indij":"A+","strategy":"컨소시엄","next":"울산항 PoC 레퍼런스와 연계 영업","stage":"예산","status":"미접촉","progress":0},
+    {"no":10,"name":"산림재난 시스템 고도화","agency":"산림청","market":"재난·안전 AI","budget":6900000000,"basis":"확정","expected":"2027 Q1~Q2","datacook":"S+","indij":"B+","strategy":"데이터쿡 중심","next":"산불·산사태 GIS/AI 제안패키지","stage":"예산","status":"미접촉","progress":0}
+  ]
+}
